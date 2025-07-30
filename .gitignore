@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pt
+.env
+node_modules/
+android/
+ios/
+.vscode/
+*.log
+.DS_Store
+.expo/
+.expo-shared/

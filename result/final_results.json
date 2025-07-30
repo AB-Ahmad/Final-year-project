@@ -1,0 +1,122 @@
+{
+  "1": {
+    "marked": "INVALID",
+    "confidence": 0.0
+  },
+  "2": {
+    "marked": "INVALID",
+    "confidence": 0.0
+  },
+  "3": {
+    "marked": "INVALID",
+    "confidence": 0.0
+  },
+  "4": {
+    "marked": "B",
+    "confidence": 0.7630749940872192
+  },
+  "5": {
+    "marked": "C",
+    "confidence": 0.8788706660270691
+  },
+  "6": {
+    "marked": "A",
+    "confidence": 0.9233149290084839
+  },
+  "7": {
+    "marked": "B",
+    "confidence": 0.8207792043685913
+  },
+  "8": {
+    "marked": "A",
+    "confidence": 0.9365489482879639
+  },
+  "9": {
+    "marked": "B",
+    "confidence": 0.8682045340538025
+  },
+  "10": {
+    "marked": "D",
+    "confidence": 0.8150471448898315
+  },
+  "11": {
+    "marked": "C",
+    "confidence": 0.8581809401512146
+  },
+  "12": {
+    "marked": "B",
+    "confidence": 0.9023459553718567
+  },
+  "13": {
+    "marked": "B",
+    "confidence": 0.8382771015167236
+  },
+  "14": {
+    "marked": "E",
+    "confidence": 0.9116659760475159
+  },
+  "15": {
+    "marked": "E",
+    "confidence": 0.931239902973175
+  },
+  "16": {
+    "marked": "B",
+    "confidence": 0.7630749940872192
+  },
+  "17": {
+    "marked": "C",
+    "confidence": 0.8788706660270691
+  },
+  "18": {
+    "marked": "A",
+    "confidence": 0.9188617467880249
+  },
+  "19": {
+    "marked": "D",
+    "confidence": 0.7089032530784607
+  },
+  "20": {
+    "marked": "B",
+    "confidence": 0.8207792043685913
+  },
+  "21": {
+    "marked": "B",
+    "confidence": 0.8629959225654602
+  },
+  "22": {
+    "marked": "C",
+    "confidence": 0.7648072838783264
+  },
+  "23": {
+    "marked": "B",
+    "confidence": 0.8682045340538025
+  },
+  "24": {
+    "marked": "D",
+    "confidence": 0.8150471448898315
+  },
+  "25": {
+    "marked": "C",
+    "confidence": 0.8581809401512146
+  },
+  "26": {
+    "marked": "B",
+    "confidence": 0.9023459553718567
+  },
+  "27": {
+    "marked": "C",
+    "confidence": 0.8430392146110535
+  },
+  "28": {
+    "marked": "B",
+    "confidence": 0.8382771015167236
+  },
+  "29": {
+    "marked": "C",
+    "confidence": 0.7970201969146729
+  },
+  "30": {
+    "marked": "D",
+    "confidence": 0.8840674757957458
+  }
+}
