@@ -24,9 +24,7 @@ export default function GradingResultScreen({ route }) {
               resizeMode="contain"
             />
           ) : (
-            <Text style={{ color: "gray", marginVertical: 10 }}>
-              No debug image available
-            </Text>
+            <Text style={styles.noImageText}>No debug image available</Text>
           )}
 
           <Text style={styles.subTitle}>Detailed Breakdown:</Text>
@@ -60,12 +58,6 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', marginVertical: 4 },
   qText: { fontWeight: 'bold', marginRight: 10 },
   answerText: { flex: 1 },
-  debugImage: {
-    width: '100%',
-    height: 400,
-    marginVertical: 15,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
+  debugImage: { width: '100%', height: 400, marginVertical: 15, borderRadius: 8, borderWidth: 1, borderColor: '#ddd' },
+  noImageText: { color: "gray", marginVertical: 10 },
 });

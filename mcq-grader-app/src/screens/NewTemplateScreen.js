@@ -18,36 +18,28 @@ export default function NewTemplateScreen({ navigation }) {
       return;
     }
 
-    // ✅ Reject blanks or invalid entries
-    if (answers.some((ans) => !['A', 'B', 'C', 'D', 'E'].includes(ans))) {
-      Alert.alert('Validation Error', 'Please enter A–E for all answers (no blanks allowed).');
+    if (answers.some(ans => !['A','B','C','D','E'].includes(ans))) {
+      Alert.alert('Validation Error', 'Please enter A–E for all answers (no blanks).');
       return;
     }
 
     try {
       const existing = await AsyncStorage.getItem('templates');
       const templates = existing ? JSON.parse(existing) : {};
-
       const code = courseCode.toUpperCase();
 
-      // ✅ Prevent overwrite, enforce unique course codes
       if (templates[code]) {
-        Alert.alert(
-          'Duplicate Error',
-          `Template for ${code} already exists. Please use a different course code.`
-        );
+        Alert.alert('Duplicate Error', `Template for ${code} already exists.`);
         return;
       }
 
       templates[code] = answers;
-
       await AsyncStorage.setItem('templates', JSON.stringify(templates));
       Alert.alert('Success', `Template for ${code} saved successfully!`);
-
       navigation.goBack();
     } catch (error) {
-      Alert.alert('Error', 'Failed to save the template.');
       console.error(error);
+      Alert.alert('Error', 'Failed to save the template.');
     }
   };
 
@@ -64,14 +56,14 @@ export default function NewTemplateScreen({ navigation }) {
 
       <Text style={styles.section}>Enter Correct Answers (A–E)</Text>
 
-      {answers.map((answer, index) => (
-        <View key={index} style={styles.questionRow}>
-          <Text style={styles.qLabel}>Q{index + 1}:</Text>
+      {answers.map((ans, i) => (
+        <View key={i} style={styles.questionRow}>
+          <Text style={styles.qLabel}>Q{i+1}:</Text>
           <TextInput
             style={styles.qInput}
-            value={answer}
+            value={ans}
             maxLength={1}
-            onChangeText={(text) => handleAnswerChange(text, index)}
+            onChangeText={(text) => handleAnswerChange(text, i)}
             placeholder="A–E"
             autoCapitalize="characters"
           />
@@ -97,11 +89,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: '#f9f9f9',
   },
-  questionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 5,
-  },
+  questionRow: { flexDirection: 'row', alignItems: 'center', marginVertical: 5 },
   qLabel: { width: 40, fontWeight: '600' },
   qInput: {
     borderWidth: 1,
@@ -120,8 +108,5 @@ const styles = StyleSheet.create({
     marginTop: 30,
     alignItems: 'center',
   },
-  saveButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
+  saveButtonText: { color: 'white', fontWeight: 'bold' },
 });

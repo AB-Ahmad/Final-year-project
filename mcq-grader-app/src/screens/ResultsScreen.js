@@ -1,204 +1,166 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator, FlatList } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import { BASE_URL } from '../../config';
+import React, { useState, useEffect } from "react";
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import { Swipeable } from "react-native-gesture-handler";
 
-export default function ResultsScreen({ navigation }) {
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [loading, setLoading] = useState(false);
+export default function ResultsScreen() {
   const [results, setResults] = useState([]);
 
-  // 🔹 Load saved results every time screen is focused
   useEffect(() => {
     const loadResults = async () => {
       try {
-        const stored = await AsyncStorage.getItem('gradedResults');
-        if (stored) {
-          setResults(JSON.parse(stored));
-        } else {
-          setResults([]);
-        }
+        const stored = await AsyncStorage.getItem("gradedResults");
+        setResults(stored ? JSON.parse(stored) : []);
       } catch (error) {
-        console.error("Failed to load results", error);
+        console.error("Error loading results:", error);
       }
     };
+    loadResults();
+  }, []);
 
-    const unsubscribe = navigation.addListener("focus", loadResults);
-    loadResults(); // run once on mount
-    return unsubscribe;
-  }, [navigation]);
-
-  const pickImage = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert("Permission Required", "Please allow access to your photo library.");
+  // 🔹 Convert results to CSV
+  const exportToCSV = async () => {
+    if (results.length === 0) {
+      Alert.alert("No Results", "There are no graded results to export.");
       return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-      base64: false,
+    let csv = "RegNumber,Course,Score,Total,Timestamp\n";
+    results.forEach(r => {
+      csv += `${r.reg_number},${r.courseCode},${r.score},${r.total},${r.timestamp}\n`;
     });
 
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
-    }
-  };
-
-  const gradeImage = async () => {
-    if (!selectedImage) {
-      Alert.alert("No Image Selected", "Please select an image first.");
-      return;
-    }
-
-    setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', {
-        uri: selectedImage,
-        type: 'image/jpeg',
-        name: 'answer_sheet.jpg',
-      });
+      const fileUri = FileSystem.documentDirectory + "graded_results.csv";
+      await FileSystem.writeAsStringAsync(fileUri, csv, { encoding: FileSystem.EncodingType.UTF8 });
 
-      const response = await axios.post(`${BASE_URL}/grade`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-
-      const data = response.data;
-
-      if (!data || !data.answers) {
-        throw new Error("Invalid grading response");
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(fileUri);
+      } else {
+        Alert.alert("Exported", `CSV saved at ${fileUri}`);
       }
-
-      const gradedResult = {
-        reg_number: data.reg_number,
-        score: data.score,
-        total: data.total,
-        details: data.details,
-        debug_image: data.debug_image || null, // ✅ ensure debug image is included
-        timestamp: new Date().toLocaleString(),
-      };
-
-      // Save to AsyncStorage
-      const existing = await AsyncStorage.getItem('gradedResults');
-      const allResults = existing ? JSON.parse(existing) : [];
-      allResults.push(gradedResult);
-      await AsyncStorage.setItem('gradedResults', JSON.stringify(allResults));
-
-      setResults(allResults);
-
-      // 🔹 Navigate to full result screen
-      navigation.navigate('GradingResult', { result: gradedResult });
-
     } catch (error) {
-      console.error(error);
-      Alert.alert("Error", error.message);
-    } finally {
-      setLoading(false);
+      console.error("CSV export error:", error);
+      Alert.alert("Error", "Failed to export CSV file.");
     }
   };
 
-  const clearResults = async () => {
-    Alert.alert("Confirm", "Are you sure you want to clear all graded results?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Clear",
-        style: "destructive",
-        onPress: async () => {
-          await AsyncStorage.removeItem("gradedResults");
-          setResults([]); // update UI immediately
-        }
-      }
-    ]);
+  // 🔹 Delete a single result
+  const deleteResult = async (index) => {
+    try {
+      const updated = [...results];
+      updated.splice(index, 1);
+      setResults(updated);
+      await AsyncStorage.setItem("gradedResults", JSON.stringify(updated));
+    } catch (error) {
+      console.error("Error deleting result:", error);
+      Alert.alert("Error", "Failed to delete result.");
+    }
   };
+
+  // 🔹 Clear all results
+  const clearResults = async () => {
+    Alert.alert(
+      "Confirm",
+      "Are you sure you want to delete all results?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete All",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await AsyncStorage.removeItem("gradedResults");
+              setResults([]);
+              Alert.alert("Success", "All results have been cleared.");
+            } catch (error) {
+              console.error("Error clearing results:", error);
+              Alert.alert("Error", "Failed to clear results.");
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  // 🔹 Right action for swipe-to-delete
+  const renderRightActions = (index) => (
+    <TouchableOpacity
+      style={styles.deleteButton}
+      onPress={() => deleteResult(index)}
+    >
+      <Text style={styles.deleteText}>🗑️ Delete</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Upload Answer Sheet</Text>
-      <Text style={styles.subtitle}>Use camera or gallery to upload scanned MCQ sheet.</Text>
+      <Text style={styles.title}>📊 Grading Results</Text>
 
-      <TouchableOpacity style={styles.button} onPress={pickImage}>
-        <Text style={styles.buttonText}>📷 Select Image</Text>
+      <FlatList
+        data={results}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item, index }) => (
+          <Swipeable renderRightActions={() => renderRightActions(index)}>
+            <View style={styles.card}>
+              <Text style={styles.course}>{item.courseCode}</Text>
+              <Text>Reg: {item.reg_number}</Text>
+              <Text>Score: {item.score}/{item.total}</Text>
+              <Text style={styles.timestamp}>{item.timestamp}</Text>
+            </View>
+          </Swipeable>
+        )}
+      />
+
+      {/* 🔹 Export Button */}
+      <TouchableOpacity style={styles.exportButton} onPress={exportToCSV}>
+        <Text style={styles.exportButtonText}>📤 Export to CSV</Text>
       </TouchableOpacity>
 
-      {selectedImage && (
-        <>
-          <Image source={{ uri: selectedImage }} style={styles.imagePreview} resizeMode="contain" />
-          <TouchableOpacity style={[styles.button, { backgroundColor: '#10b981' }]} onPress={gradeImage}>
-            <Text style={styles.buttonText}>Grade Now</Text>
-          </TouchableOpacity>
-        </>
-      )}
-
-      {loading && <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: 20 }} />}
-
-      {/* 🔹 Results Section */}
-      <Text style={[styles.title, { marginTop: 30 }]}>Saved Results</Text>
-
-      {results.length === 0 ? (
-        <Text style={styles.subtitle}>No results saved yet.</Text>
-      ) : (
-        <>
-          <FlatList
-            data={results}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.resultCard}>
-                <Text style={styles.resultText}>Reg No: {item.reg_number}</Text>
-                <Text style={styles.resultText}>Score: {item.score}/{item.total}</Text>
-                <Text style={styles.resultText}>Date: {item.timestamp}</Text>
-
-                {item.debug_image && (
-                  <Image
-                    source={{ uri: `data:image/jpeg;base64,${item.debug_image}` }}
-                    style={styles.resultImage}
-                    resizeMode="contain"
-                  />
-                )}
-              </View>
-            )}
-          />
-
-          <TouchableOpacity style={[styles.button, { backgroundColor: '#ef4444' }]} onPress={clearResults}>
-            <Text style={styles.buttonText}>🗑️ Clear All Results</Text>
-          </TouchableOpacity>
-        </>
-      )}
+      {/* 🔹 Clear Results Button */}
+      <TouchableOpacity style={styles.clearButton} onPress={clearResults}>
+        <Text style={styles.clearButtonText}>🗑️ Clear All Results</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'flex-start', alignItems: 'center', padding: 20, backgroundColor: 'white' },
-  title: { fontSize: 20, fontWeight: 'bold', marginTop: 20, marginBottom: 10 },
-  subtitle: { color: 'gray', marginBottom: 20, textAlign: 'center' },
-  button: { backgroundColor: '#3b82f6', padding: 15, borderRadius: 10, width: '80%', marginBottom: 20 },
-  buttonText: { color: 'white', textAlign: 'center', fontWeight: 'bold' },
-  imagePreview: {
-    width: '100%',
-    height: 400,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginTop: 10,
-  },
-  resultCard: {
-    backgroundColor: '#f3f4f6',
+  container: { flex: 1, padding: 20, backgroundColor: "white" },
+  title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
+  card: {
+    backgroundColor: "#f3f4f6",
     padding: 15,
     borderRadius: 10,
-    marginVertical: 8,
-    width: '100%',
+    marginBottom: 10,
   },
-  resultText: { fontSize: 16, marginBottom: 4 },
-  resultImage: {
-    width: "100%",
-    height: 200,
+  course: { fontSize: 18, fontWeight: "bold" },
+  timestamp: { fontSize: 12, color: "#666", marginTop: 5 },
+  exportButton: {
+    backgroundColor: "#3b82f6",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  exportButtonText: { color: "white", fontWeight: "bold", fontSize: 16 },
+  clearButton: {
+    backgroundColor: "#ef4444", // red
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
     marginTop: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
   },
+  clearButtonText: { color: "white", fontWeight: "bold", fontSize: 16 },
+  deleteButton: {
+    backgroundColor: "#ef4444",
+    justifyContent: "center",
+    alignItems: "flex-end",
+    paddingHorizontal: 20,
+    marginBottom: 10,
+    borderRadius: 10,
+  },
+  deleteText: { color: "white", fontWeight: "bold" },
 });
