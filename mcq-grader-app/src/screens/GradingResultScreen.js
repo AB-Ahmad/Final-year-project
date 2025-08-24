@@ -1,88 +1,71 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
 
-export default function ResultsScreen() {
-  const [results, setResults] = useState([]);
-
-  // Load results from storage on screen load
-  useEffect(() => {
-    const loadResults = async () => {
-      try {
-        const storedResults = await AsyncStorage.getItem('gradedResults');
-        if (storedResults) {
-          setResults(JSON.parse(storedResults));
-        }
-      } catch (error) {
-        console.error('Error loading results:', error);
-      }
-    };
-    loadResults();
-  }, []);
-
-  const clearResults = async () => {
-    Alert.alert('Confirm', 'Are you sure you want to clear all results?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Clear',
-        onPress: async () => {
-          await AsyncStorage.removeItem('gradedResults');
-          setResults([]);
-        },
-        style: 'destructive',
-      },
-    ]);
-  };
-
-  const renderItem = ({ item }) => (
-    <View style={styles.resultCard}>
-      <Text style={styles.regNumber}>Reg No: {item.reg_number}</Text>
-      <Text style={styles.score}>Score: {item.score}/{item.total}</Text>
-      <Text style={styles.timestamp}>Date: {item.timestamp}</Text>
-    </View>
-  );
+export default function GradingResultScreen({ route }) {
+  const { result } = route.params;
 
   return (
-    <View style={styles.container}>
-      {results.length === 0 ? (
-        <Text style={styles.noResults}>No graded results yet. Grade some scripts to see them here.</Text>
-      ) : (
-        <FlatList
-          data={results}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-        />
-      )}
+    <FlatList
+      data={result.details}
+      keyExtractor={(item) => item.question.toString()}
+      ListHeaderComponent={() => (
+        <View>
+          <Text style={styles.title}>Grading Result</Text>
 
-      {results.length > 0 && (
-        <TouchableOpacity style={styles.clearButton} onPress={clearResults}>
-          <Text style={styles.clearButtonText}>Clear All Results</Text>
-        </TouchableOpacity>
+          <Text style={styles.info}>Reg No: {result.reg_number}</Text>
+          <Text style={styles.info}>Course: {result.courseCode}</Text>
+          <Text style={styles.info}>Score: {result.score}/{result.total}</Text>
+          <Text style={styles.info}>Date: {result.timestamp}</Text>
+
+          {result.debug_image ? (
+            <Image
+              source={{ uri: `data:image/png;base64,${result.debug_image}` }}
+              style={styles.debugImage}
+              resizeMode="contain"
+            />
+          ) : (
+            <Text style={{ color: "gray", marginVertical: 10 }}>
+              No debug image available
+            </Text>
+          )}
+
+          <Text style={styles.subTitle}>Detailed Breakdown:</Text>
+        </View>
       )}
-    </View>
+      renderItem={({ item }) => (
+        <View style={styles.row}>
+          <Text style={styles.qText}>Q{item.question}:</Text>
+          <Text
+            style={[
+              styles.answerText,
+              item.status.includes("Correct") && { color: "green" },
+              item.status.includes("Wrong") && { color: "red" },
+              item.status.includes("Blank") && { color: "gray" },
+            ]}
+          >
+            Marked: {item.marked || "-"} | Correct: {item.correct || "-"} | {item.status}
+          </Text>
+        </View>
+      )}
+      contentContainerStyle={styles.container}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: 'white' },
-  noResults: { textAlign: 'center', marginTop: 50, color: 'gray' },
-  resultCard: {
-    padding: 15,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-    marginVertical: 8,
+  container: { padding: 20, backgroundColor: 'white' },
+  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+  info: { fontSize: 18, marginVertical: 6 },
+  subTitle: { fontSize: 20, fontWeight: 'bold', marginVertical: 15 },
+  row: { flexDirection: 'row', marginVertical: 4 },
+  qText: { fontWeight: 'bold', marginRight: 10 },
+  answerText: { flex: 1 },
+  debugImage: {
+    width: '100%',
+    height: 400,
+    marginVertical: 15,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
   },
-  regNumber: { fontWeight: 'bold', fontSize: 16 },
-  score: { marginTop: 5, color: '#3b82f6', fontWeight: '600' },
-  timestamp: { marginTop: 5, color: 'gray', fontSize: 12 },
-  clearButton: {
-    backgroundColor: 'red',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  clearButtonText: { color: 'white', fontWeight: 'bold' },
 });

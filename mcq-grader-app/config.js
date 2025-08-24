@@ -1,2 +1,2 @@
 // config.js
-export const API_URL = 'http://172.20.10.5:8000'; // ← Replace with your actual local IP
+export const BASE_URL =  "http://10.96.240.250:8000";

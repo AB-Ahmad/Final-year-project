@@ -7,12 +7,12 @@ from ultralytics import YOLO
 
 # === CONFIGURATION ===
 MCQ_MODEL_PATH = 'models/yolov8_bubbles_best.pt'
-REG_MODEL_PATH = 'models/reg_number_model_v1.pt'
-SAMPLE_IMAGE = 'reg_Number/photo_2025-07-25_18-57-34.jpg'#reg_Number/photo_2025-07-25_18-56-59.jpg'photo_2025-07-25_18-56-59.jpg
+REG_MODEL_PATH = 'models/regnum_yolov8_real_best.pt'
+SAMPLE_IMAGE = 'reg_Number/photo_2025-07-25_18-56-59.jpg'
 OUTPUT_JSON = 'results_final.json'
 OUTPUT_IMAGE = 'graded_images/final_output.jpg'
 MARKER_DEBUG_IMAGE = 'graded_images/marker_debug.jpg'
-CONF_THRESHOLD_REG = 0.3
+CONF_THRESHOLD_REG = 0.5
 EXPECTED_REG_LENGTH = 9
 REGEX_PATTERN = r'^U\d{2}[A-Z]{2}\d{4}$'
 

@@ -1,151 +1,110 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Button,
-  Image,
-  ActivityIndicator,
-  Alert,
-  Platform
-} from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { API_URL } from '../../config'; // adjust path if needed
-
-const GradeScreen = () => {
+export default function GradeScreen({ route, navigation }) {
+  const { template, courseCode } = route.params;  // ✅ now passed from TemplatesScreen
   const [image, setImage] = useState(null);
-  const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const pickFromGallery = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-    });
-
-    if (!result.canceled && result.assets?.length > 0) {
-      setImage(result.assets[0].uri);
-      setResult(null);
-    }
-  };
-
-  const takePhoto = async () => {
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert('Permission Denied', 'Camera access is required to take a photo.');
+  const pickImage = async () => {
+    let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("Permission to access gallery is required!");
       return;
     }
 
-    const result = await ImagePicker.launchCameraAsync({
+    let pickerResult = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       quality: 1,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
     });
 
-    if (!result.canceled && result.assets?.length > 0) {
-      setImage(result.assets[0].uri);
-      setResult(null);
+    if (!pickerResult.canceled) {
+      const uri = pickerResult.assets[0].uri;
+      setImage(uri);
     }
   };
 
   const uploadImage = async () => {
-    if (!image) {
-      Alert.alert('No image selected', 'Please pick or take an image first.');
-      return;
-    }
-
-    setLoading(true);
-
-    const fileUri = Platform.OS === 'ios' ? image.replace('file://', '') : image;
-
-    const formData = new FormData();
-    formData.append('file', {
-      uri: fileUri,
-      type: 'image/jpeg',
-      name: 'mcq.jpg',
-    });
+    if (!image) return;
 
     try {
-      const response = await fetch(`${API_URL}/grade`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          Accept: 'application/json',
-        },
+      setLoading(true);
+
+      const filename = image.split('/').pop();
+      const base64 = await FileSystem.readAsStringAsync(image, {
+        encoding: FileSystem.EncodingType.Base64,
       });
 
-      console.log('📤 Sent to:', `${API_URL}/grade`);
-      console.log('📎 Image URI:', image);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ Server responded with error:', errorText);
-        throw new Error(errorText || 'Upload failed');
-      }
+      const response = await fetch(`${BASE_URL}/grade_base64`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          filename,
+          content: base64,
+        }),
+      });
 
       const data = await response.json();
-      console.log('✅ Server response:', data);
-      setResult(data);
+      if (!data || !data.answers) {
+        throw new Error("Invalid grading response");
+      }
+
+      // 🔹 Build details using template
+      const details = [];
+      let score = 0;
+      template.forEach((correct, idx) => {
+        const marked = data.answers[idx] || "";
+        let status = "Blank";
+        if (marked) {
+          if (marked === correct) {
+            status = "Correct ✅";
+            score++;
+          } else {
+            status = `Wrong ❌ (marked ${marked})`;
+          }
+        }
+        details.push({ question: idx + 1, marked, correct, status });
+      });
+
+      const result = {
+        reg_number: data.reg_number || "UNKNOWN",
+        score,
+        total: template.length,
+        courseCode,
+        timestamp: new Date().toLocaleString(),
+        details,
+      };
+
+      const existing = await AsyncStorage.getItem('gradedResults');
+      const results = existing ? JSON.parse(existing) : [];
+      results.push(result);
+      await AsyncStorage.setItem('gradedResults', JSON.stringify(results));
+
+      navigation.navigate('GradingResult', { result });
+
     } catch (error) {
-      console.error('🛑 Upload error (full):', error);
-      Alert.alert('Error', error.message || 'Upload failed. Check server and image.');
+      console.error("Upload failed:", error);
+      Alert.alert("Upload failed", error.message || "Unknown error");
     } finally {
       setLoading(false);
     }
   };
 
-  const testConnection = async () => {
-    try {
-      const res = await fetch(`${API_URL}/docs`);
-      Alert.alert('Backend Connected', `Status: ${res.status}`);
-    } catch (err) {
-      Alert.alert('Connection Failed', err.message);
-    }
-  };
-
   return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
-        Upload or Take Answer Sheet Photo
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.courseCode}>Course: {courseCode}</Text>
 
-      <Button title="📂 Pick from Gallery" onPress={pickFromGallery} />
-      <View style={{ marginVertical: 10 }}>
-        <Button title="📸 Take Photo with Camera" onPress={takePhoto} color="#6366f1" />
-      </View>
-      <View style={{ marginVertical: 10 }}>
-        <Button title="🔌 Test Backend Connection" onPress={testConnection} color="#f59e0b" />
-      </View>
+      <Button title="Pick an Image" onPress={pickImage} />
 
       {image && (
-        <>
-          <Image
-            source={{ uri: image }}
-            style={{ width: '100%', height: 300, marginVertical: 10, borderRadius: 10 }}
-            resizeMode="contain"
-          />
-          <Button title="🚀 Upload and Grade" onPress={uploadImage} color="#22c55e" />
-        </>
+        <Image source={{ uri: image }} style={styles.image} />
+      )}
+      {image && (
+        <Button title="Upload & Grade" onPress={uploadImage} />
       )}
 
-      {loading && <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: 20 }} />}
-
-      {result && (
-        <View
-          style={{
-            marginTop: 20,
-            backgroundColor: '#f3f4f6',
-            padding: 15,
-            borderRadius: 10,
-          }}
-        >
-          <Text style={{ fontWeight: 'bold' }}>Reg Number: {result.reg_number}</Text>
-          <Text>
-            Score: {result.score} / {result.total}
-          </Text>
-        </View>
-      )}
+      {loading && <ActivityIndicator size="large" color="#0000ff" />}
     </View>
   );
-};
-
-export default GradeScreen;
+}

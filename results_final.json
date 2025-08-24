@@ -1,21 +1,21 @@
 {
-  "reg_number": "U22CO2251",
-  "score": 1,
+  "reg_number": "U",
+  "score": 0,
   "total": 30,
   "details": [
     {
       "question": 1,
+      "marked": "F",
+      "correct": "A",
+      "status": "Wrong (marked F)",
+      "confidence": 0.9195007681846619
+    },
+    {
+      "question": 2,
       "marked": "",
       "correct": "A",
       "status": "Blank",
       "confidence": 0.0
-    },
-    {
-      "question": 2,
-      "marked": "C",
-      "correct": "A",
-      "status": "Wrong (marked C)",
-      "confidence": 0.877201497554779
     },
     {
       "question": 3,
@@ -26,10 +26,10 @@
     },
     {
       "question": 4,
-      "marked": "B",
+      "marked": "F",
       "correct": "A",
-      "status": "Wrong (marked B)",
-      "confidence": 0.8919833302497864
+      "status": "Wrong (marked F)",
+      "confidence": 0.8944535851478577
     },
     {
       "question": 5,
@@ -40,10 +40,10 @@
     },
     {
       "question": 6,
-      "marked": "D",
+      "marked": "F",
       "correct": "A",
-      "status": "Wrong (marked D)",
-      "confidence": 0.8851318359375
+      "status": "Wrong (marked F)",
+      "confidence": 0.8565263748168945
     },
     {
       "question": 7,
@@ -57,7 +57,7 @@
       "marked": "F",
       "correct": "C",
       "status": "Wrong (marked F)",
-      "confidence": 0.952157199382782
+      "confidence": 0.9148605465888977
     },
     {
       "question": 9,
@@ -75,10 +75,10 @@
     },
     {
       "question": 11,
-      "marked": "B",
+      "marked": "F",
       "correct": "A",
-      "status": "Wrong (marked B)",
-      "confidence": 0.8162516355514526
+      "status": "Wrong (marked F)",
+      "confidence": 0.8655779957771301
     },
     {
       "question": 12,
@@ -89,10 +89,10 @@
     },
     {
       "question": 13,
-      "marked": "C",
+      "marked": "F",
       "correct": "C",
-      "status": "Correct",
-      "confidence": 0.8843302130699158
+      "status": "Wrong (marked F)",
+      "confidence": 0.905800461769104
     },
     {
       "question": 14,
@@ -103,10 +103,10 @@
     },
     {
       "question": 15,
-      "marked": "B",
+      "marked": "F",
       "correct": "A",
-      "status": "Wrong (marked B)",
-      "confidence": 0.8504735231399536
+      "status": "Wrong (marked F)",
+      "confidence": 0.9268911480903625
     },
     {
       "question": 16,
@@ -120,7 +120,7 @@
       "marked": "F",
       "correct": "A",
       "status": "Wrong (marked F)",
-      "confidence": 0.9228737950325012
+      "confidence": 0.9179490804672241
     },
     {
       "question": 18,
@@ -134,7 +134,7 @@
       "marked": "F",
       "correct": "A",
       "status": "Wrong (marked F)",
-      "confidence": 0.9321693778038025
+      "confidence": 0.8790643811225891
     },
     {
       "question": 20,
@@ -148,7 +148,7 @@
       "marked": "F",
       "correct": "A",
       "status": "Wrong (marked F)",
-      "confidence": 0.9421307444572449
+      "confidence": 0.916754424571991
     },
     {
       "question": 22,
@@ -159,17 +159,17 @@
     },
     {
       "question": 23,
-      "marked": "F",
+      "marked": "",
       "correct": "C",
-      "status": "Wrong (marked F)",
-      "confidence": 0.9215629696846008
+      "status": "Blank",
+      "confidence": 0.0
     },
     {
       "question": 24,
-      "marked": "",
+      "marked": "F",
       "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Wrong (marked F)",
+      "confidence": 0.928424596786499
     },
     {
       "question": 25,
@@ -183,7 +183,7 @@
       "marked": "F",
       "correct": "A",
       "status": "Wrong (marked F)",
-      "confidence": 0.9014406800270081
+      "confidence": 0.8623541593551636
     },
     {
       "question": 27,
@@ -197,7 +197,7 @@
       "marked": "F",
       "correct": "C",
       "status": "Wrong (marked F)",
-      "confidence": 0.8991066813468933
+      "confidence": 0.9246013164520264
     },
     {
       "question": 29,
@@ -211,7 +211,7 @@
       "marked": "F",
       "correct": "A",
       "status": "Wrong (marked F)",
-      "confidence": 0.9326567649841309
+      "confidence": 0.929939866065979
     }
   ]
 }

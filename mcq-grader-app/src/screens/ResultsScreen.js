@@ -1,12 +1,34 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator, FlatList } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { BASE_URL } from '../../config';
 
-export default function GradeScreen({ navigation }) {
+export default function ResultsScreen({ navigation }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState([]);
+
+  // 🔹 Load saved results every time screen is focused
+  useEffect(() => {
+    const loadResults = async () => {
+      try {
+        const stored = await AsyncStorage.getItem('gradedResults');
+        if (stored) {
+          setResults(JSON.parse(stored));
+        } else {
+          setResults([]);
+        }
+      } catch (error) {
+        console.error("Failed to load results", error);
+      }
+    };
+
+    const unsubscribe = navigation.addListener("focus", loadResults);
+    loadResults(); // run once on mount
+    return unsubscribe;
+  }, [navigation]);
 
   const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -41,36 +63,56 @@ export default function GradeScreen({ navigation }) {
         name: 'answer_sheet.jpg',
       });
 
-      const response = await axios.post('http://127.0.0.1:8000/grade', formData, {
+      const response = await axios.post(`${BASE_URL}/grade`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       const data = response.data;
 
-      // Add timestamp to result
+      if (!data || !data.answers) {
+        throw new Error("Invalid grading response");
+      }
+
       const gradedResult = {
         reg_number: data.reg_number,
         score: data.score,
         total: data.total,
         details: data.details,
+        debug_image: data.debug_image || null, // ✅ ensure debug image is included
         timestamp: new Date().toLocaleString(),
       };
 
       // Save to AsyncStorage
       const existing = await AsyncStorage.getItem('gradedResults');
-      const results = existing ? JSON.parse(existing) : [];
-      results.push(gradedResult);
-      await AsyncStorage.setItem('gradedResults', JSON.stringify(results));
+      const allResults = existing ? JSON.parse(existing) : [];
+      allResults.push(gradedResult);
+      await AsyncStorage.setItem('gradedResults', JSON.stringify(allResults));
 
-      Alert.alert("Grading Complete", `Reg No: ${gradedResult.reg_number}\nScore: ${gradedResult.score}/${gradedResult.total}`);
+      setResults(allResults);
 
-      navigation.navigate('Results');
+      // 🔹 Navigate to full result screen
+      navigation.navigate('GradingResult', { result: gradedResult });
+
     } catch (error) {
       console.error(error);
-      Alert.alert("Error", "Failed to grade the image. Check your backend.");
+      Alert.alert("Error", error.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const clearResults = async () => {
+    Alert.alert("Confirm", "Are you sure you want to clear all graded results?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Clear",
+        style: "destructive",
+        onPress: async () => {
+          await AsyncStorage.removeItem("gradedResults");
+          setResults([]); // update UI immediately
+        }
+      }
+    ]);
   };
 
   return (
@@ -92,13 +134,46 @@ export default function GradeScreen({ navigation }) {
       )}
 
       {loading && <ActivityIndicator size="large" color="#3b82f6" style={{ marginTop: 20 }} />}
+
+      {/* 🔹 Results Section */}
+      <Text style={[styles.title, { marginTop: 30 }]}>Saved Results</Text>
+
+      {results.length === 0 ? (
+        <Text style={styles.subtitle}>No results saved yet.</Text>
+      ) : (
+        <>
+          <FlatList
+            data={results}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.resultCard}>
+                <Text style={styles.resultText}>Reg No: {item.reg_number}</Text>
+                <Text style={styles.resultText}>Score: {item.score}/{item.total}</Text>
+                <Text style={styles.resultText}>Date: {item.timestamp}</Text>
+
+                {item.debug_image && (
+                  <Image
+                    source={{ uri: `data:image/jpeg;base64,${item.debug_image}` }}
+                    style={styles.resultImage}
+                    resizeMode="contain"
+                  />
+                )}
+              </View>
+            )}
+          />
+
+          <TouchableOpacity style={[styles.button, { backgroundColor: '#ef4444' }]} onPress={clearResults}>
+            <Text style={styles.buttonText}>🗑️ Clear All Results</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'flex-start', alignItems: 'center', padding: 20, backgroundColor: 'white' },
-  title: { fontSize: 20, fontWeight: 'bold', marginTop: 40, marginBottom: 10 },
+  title: { fontSize: 20, fontWeight: 'bold', marginTop: 20, marginBottom: 10 },
   subtitle: { color: 'gray', marginBottom: 20, textAlign: 'center' },
   button: { backgroundColor: '#3b82f6', padding: 15, borderRadius: 10, width: '80%', marginBottom: 20 },
   buttonText: { color: 'white', textAlign: 'center', fontWeight: 'bold' },
@@ -109,5 +184,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     marginTop: 10,
+  },
+  resultCard: {
+    backgroundColor: '#f3f4f6',
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 8,
+    width: '100%',
+  },
+  resultText: { fontSize: 16, marginBottom: 4 },
+  resultImage: {
+    width: "100%",
+    height: 200,
+    marginTop: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
 });

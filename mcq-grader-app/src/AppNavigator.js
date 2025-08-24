@@ -6,21 +6,62 @@ import { Ionicons } from '@expo/vector-icons';
 
 import HomeScreen from './screens/HomeScreen';
 import TemplatesScreen from './screens/TemplatesScreen';
+import NewTemplateScreen from './screens/NewTemplateScreen';
 import ResultsScreen from './screens/ResultsScreen';
-import SettingsScreen from './screens/SettingsScreen';
 import GradeScreen from './screens/GradeScreen';
 import GradingResultScreen from './screens/GradingResultScreen';
+import SettingsScreen from './screens/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-// Results stack to navigate between Grade → GradingResult
+// 📌 Stack for Templates tab
+function TemplatesStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="TemplatesMain" 
+        component={TemplatesScreen} 
+        options={{ title: "Templates" }} 
+      />
+      <Stack.Screen 
+        name="NewTemplate" 
+        component={NewTemplateScreen} 
+        options={{ title: "New Template" }} 
+      />
+      <Stack.Screen 
+        name="Grade" 
+        component={GradeScreen} 
+        options={{ title: "Grade Script" }} 
+      />
+      <Stack.Screen 
+        name="GradingResult" 
+        component={GradingResultScreen} 
+        options={{ title: "Result" }} 
+      />
+    </Stack.Navigator>
+  );
+}
+
+// 📌 Stack for Results tab
 function ResultsStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="ResultsMain" component={ResultsScreen} />
-      <Stack.Screen name="Grade" component={GradeScreen} />
-      <Stack.Screen name="GradingResult" component={GradingResultScreen} />
+    <Stack.Navigator>
+      <Stack.Screen 
+        name="ResultsMain" 
+        component={ResultsScreen} 
+        options={{ title: "Results" }} 
+      />
+      <Stack.Screen 
+        name="Grade" 
+        component={GradeScreen} 
+        options={{ title: "Grade Script" }} 
+      />
+      <Stack.Screen 
+        name="GradingResult" 
+        component={GradingResultScreen} 
+        options={{ title: "Result" }} 
+      />
     </Stack.Navigator>
   );
 }
@@ -44,7 +85,7 @@ export default function AppNavigator() {
         })}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Templates" component={TemplatesScreen} />
+        <Tab.Screen name="Templates" component={TemplatesStack} />
         <Tab.Screen name="Results" component={ResultsStack} />
         <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
