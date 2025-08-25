@@ -1,5 +1,5 @@
 {
-  "score": 20,
+  "score": 19,
   "total": 30,
   "details": [
     {
@@ -117,8 +117,8 @@
     {
       "question": 17,
       "marked": "E",
-      "correct": "E",
-      "status": "Correct",
+      "correct": "D",
+      "status": "Wrong (marked E)",
       "confidence": 0.732342541217804
     },
     {

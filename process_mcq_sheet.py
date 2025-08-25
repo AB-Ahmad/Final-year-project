@@ -9,6 +9,7 @@ from ultralytics import YOLO
 MCQ_MODEL_PATH = 'models/yolov8_bubbles_best.pt'
 REG_MODEL_PATH = 'models/reg_number_model_v1.pt'
 
+CONF_THRESHOLD_MCQ = 0.5   # ↑ bump threshold for bubble detection
 CONF_THRESHOLD_REG = 0.25
 EXPECTED_REG_LENGTH = 9
 REGEX_PATTERN = r'^U\d{2}[A-Z]{2}\d{4}$'
@@ -22,6 +23,8 @@ CORRECT_ANSWERS = {
     21: "A", 22: "A", 23: "C", 24: "A", 25: "A",
     26: "A", 27: "A", 28: "C", 29: "B", 30: "A"
 }
+
+CLASS_NAMES = ['A', 'B', 'C', 'D', 'E', 'INVALID']
 
 # === UTILS ===
 def correct_character(c):
@@ -40,7 +43,7 @@ def find_markers_and_align(image):
     candidates = []
     for cnt in contours:
         area = cv2.contourArea(cnt)
-        if 500 < area < 20000:  # filter by size
+        if 500 < area < 20000:
             rect = cv2.minAreaRect(cnt)
             w, h = rect[1]
             if w == 0 or h == 0:
@@ -54,7 +57,7 @@ def find_markers_and_align(image):
     if len(candidates) < 4:
         raise ValueError("Marker detection failed: insufficient markers found.")
 
-    # choose closest to each sheet corner
+    # Choose closest to each sheet corner
     corners = [(0, 0), (w_img, 0), (0, h_img), (w_img, h_img)]
     closest = [min(candidates, key=lambda c: np.hypot(c[0] - cx, c[1] - cy))[:2] for cx, cy in corners]
 
@@ -67,7 +70,7 @@ def find_markers_and_align(image):
 # === STEP 2: PREDICT BUBBLES ===
 def predict_mcq(image):
     model = YOLO(MCQ_MODEL_PATH)
-    results = model.predict(image)[0]
+    results = model.predict(image, conf=CONF_THRESHOLD_MCQ)[0]
     return results.boxes.xyxy, results.boxes.conf, results.boxes.cls
 
 # === STEP 3: DIVIDE QUESTIONS ===
@@ -85,7 +88,7 @@ def map_bubbles_to_questions(boxes, confs, classes, q1_15_box, q16_30_box):
     for box, conf, cls in zip(boxes, confs, classes):
         x1, y1, x2, y2 = box.tolist()
         cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
-        option = chr(65 + int(cls))
+        option = CLASS_NAMES[int(cls)]
 
         # First 15
         for i, (x, y, w, h) in enumerate(q1_rows):
@@ -107,6 +110,8 @@ def grade_answers(question_map):
         correct = CORRECT_ANSWERS.get(q_num, "?")
         if marked == correct:
             status, score = "Correct", score + 1
+        elif marked == "INVALID":
+            status = "Invalid Mark"
         elif marked:
             status = f"Wrong (marked {marked})"
         else:
@@ -114,7 +119,7 @@ def grade_answers(question_map):
 
         results.append({
             "question": q_num,
-            "marked": marked,
+            "marked": marked if marked else "-",
             "correct": correct,
             "status": status,
             "confidence": conf
@@ -140,8 +145,6 @@ def extract_reg_number(image):
     return ''.join(corrected_chars)
 
 # === MAIN PIPELINE ===
-# ...existing code...
-
 def process_sheet(image_path: str):
     if not os.path.exists(image_path):
         raise FileNotFoundError("Image not found.")
@@ -159,10 +162,11 @@ def process_sheet(image_path: str):
     question_map = map_bubbles_to_questions(boxes, confs, classes, q1_15_box, q16_30_box)
     grading = grade_answers(question_map)
     answers = [item["marked"] for item in grading["details"]]
+
     return {
         "reg_number": reg_number,
         "score": grading["score"],
         "total": grading["total"],
         "details": grading["details"],
-        "answers": answers  # <-- required for mobile app
+        "answers": answers  # required for mobile app
     }

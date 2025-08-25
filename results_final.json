@@ -1,217 +1,217 @@
 {
-  "reg_number": "U",
-  "score": 0,
+  "reg_number": "U22CO2251",
+  "score": 5,
   "total": 30,
   "details": [
     {
       "question": 1,
-      "marked": "F",
-      "correct": "A",
-      "status": "Wrong (marked F)",
-      "confidence": 0.9195007681846619
+      "marked": "B",
+      "correct": "",
+      "status": "Wrong (marked B)",
+      "confidence": 0.8460823893547058
     },
     {
       "question": 2,
-      "marked": "",
-      "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "marked": "C",
+      "correct": "C",
+      "status": "Correct",
+      "confidence": 0.888351321220398
     },
     {
       "question": 3,
-      "marked": "",
+      "marked": "C",
       "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Wrong (marked C)",
+      "confidence": 0.877201497554779
     },
     {
       "question": 4,
-      "marked": "F",
-      "correct": "A",
-      "status": "Wrong (marked F)",
-      "confidence": 0.8944535851478577
+      "marked": "B",
+      "correct": "B",
+      "status": "Correct",
+      "confidence": 0.8919833302497864
     },
     {
       "question": 5,
-      "marked": "",
+      "marked": "D",
       "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Wrong (marked D)",
+      "confidence": 0.8851318359375
     },
     {
       "question": 6,
-      "marked": "F",
-      "correct": "A",
-      "status": "Wrong (marked F)",
-      "confidence": 0.8565263748168945
+      "marked": "INVALID",
+      "correct": "D",
+      "status": "Invalid Mark",
+      "confidence": 0.952157199382782
     },
     {
       "question": 7,
-      "marked": "",
+      "marked": "B",
       "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Wrong (marked B)",
+      "confidence": 0.8162516355514526
     },
     {
       "question": 8,
-      "marked": "F",
+      "marked": "C",
       "correct": "C",
-      "status": "Wrong (marked F)",
-      "confidence": 0.9148605465888977
+      "status": "Correct",
+      "confidence": 0.8843302130699158
     },
     {
       "question": 9,
-      "marked": "",
+      "marked": "B",
       "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Wrong (marked B)",
+      "confidence": 0.8504735231399536
     },
     {
       "question": 10,
-      "marked": "",
+      "marked": "C",
       "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Wrong (marked C)",
+      "confidence": 0.8364291191101074
     },
     {
       "question": 11,
-      "marked": "F",
+      "marked": "B",
       "correct": "A",
-      "status": "Wrong (marked F)",
-      "confidence": 0.8655779957771301
+      "status": "Wrong (marked B)",
+      "confidence": 0.8824315667152405
     },
     {
       "question": 12,
-      "marked": "",
+      "marked": "B",
       "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Wrong (marked B)",
+      "confidence": 0.892874538898468
     },
     {
       "question": 13,
-      "marked": "F",
+      "marked": "C",
       "correct": "C",
-      "status": "Wrong (marked F)",
-      "confidence": 0.905800461769104
+      "status": "Correct",
+      "confidence": 0.8527616858482361
     },
     {
       "question": 14,
-      "marked": "",
+      "marked": "B",
       "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Wrong (marked B)",
+      "confidence": 0.887956440448761
     },
     {
       "question": 15,
-      "marked": "F",
+      "marked": "B",
       "correct": "A",
-      "status": "Wrong (marked F)",
-      "confidence": 0.9268911480903625
+      "status": "Wrong (marked B)",
+      "confidence": 0.8797793388366699
     },
     {
       "question": 16,
-      "marked": "",
+      "marked": "A",
       "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Correct",
+      "confidence": 0.905066728591919
     },
     {
       "question": 17,
-      "marked": "F",
+      "marked": "B",
       "correct": "A",
-      "status": "Wrong (marked F)",
-      "confidence": 0.9179490804672241
+      "status": "Wrong (marked B)",
+      "confidence": 0.8746011257171631
     },
     {
       "question": 18,
-      "marked": "",
+      "marked": "INVALID",
       "correct": "C",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Invalid Mark",
+      "confidence": 0.9228737950325012
     },
     {
       "question": 19,
-      "marked": "F",
+      "marked": "INVALID",
       "correct": "A",
-      "status": "Wrong (marked F)",
-      "confidence": 0.8790643811225891
+      "status": "Invalid Mark",
+      "confidence": 0.9321693778038025
     },
     {
       "question": 20,
-      "marked": "",
+      "marked": "INVALID",
       "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Invalid Mark",
+      "confidence": 0.9421307444572449
     },
     {
       "question": 21,
-      "marked": "F",
+      "marked": "INVALID",
       "correct": "A",
-      "status": "Wrong (marked F)",
-      "confidence": 0.916754424571991
+      "status": "Invalid Mark",
+      "confidence": 0.9215629696846008
     },
     {
       "question": 22,
-      "marked": "",
+      "marked": "INVALID",
       "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Invalid Mark",
+      "confidence": 0.9014406800270081
     },
     {
       "question": 23,
-      "marked": "",
+      "marked": "INVALID",
       "correct": "C",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Invalid Mark",
+      "confidence": 0.8991066813468933
     },
     {
       "question": 24,
-      "marked": "F",
+      "marked": "INVALID",
       "correct": "A",
-      "status": "Wrong (marked F)",
-      "confidence": 0.928424596786499
+      "status": "Invalid Mark",
+      "confidence": 0.9326567649841309
     },
     {
       "question": 25,
-      "marked": "",
+      "marked": "INVALID",
       "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Invalid Mark",
+      "confidence": 0.8667497038841248
     },
     {
       "question": 26,
-      "marked": "F",
+      "marked": "INVALID",
       "correct": "A",
-      "status": "Wrong (marked F)",
-      "confidence": 0.8623541593551636
+      "status": "Invalid Mark",
+      "confidence": 0.8886759877204895
     },
     {
       "question": 27,
-      "marked": "",
+      "marked": "INVALID",
       "correct": "A",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Invalid Mark",
+      "confidence": 0.9309199452400208
     },
     {
       "question": 28,
-      "marked": "F",
+      "marked": "INVALID",
       "correct": "C",
-      "status": "Wrong (marked F)",
-      "confidence": 0.9246013164520264
+      "status": "Invalid Mark",
+      "confidence": 0.8651231527328491
     },
     {
       "question": 29,
-      "marked": "",
+      "marked": "INVALID",
       "correct": "B",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Invalid Mark",
+      "confidence": 0.92557293176651
     },
     {
       "question": 30,
-      "marked": "F",
+      "marked": "INVALID",
       "correct": "A",
-      "status": "Wrong (marked F)",
-      "confidence": 0.929939866065979
+      "status": "Invalid Mark",
+      "confidence": 0.896511435508728
     }
   ]
 }
