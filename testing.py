@@ -5,7 +5,7 @@ import os
 
 # === CONFIGURATION ===
 MODEL_PATH = 'models/yolov8_bubbles_best.pt'
-SAMPLE_IMAGE = 'Test_images/sheet05.jpg'
+SAMPLE_IMAGE = 'Test_images/sheet11.jpg'
 OUTPUT_JSON = 'result/results.json'
 SAVE_IMAGE = 'graded_images/output_debug.jpg'
 DEBUG_DIVISION_IMAGE = 'graded_images/debug_divisions.jpg'
@@ -13,10 +13,10 @@ MAPPED_IMAGE = 'graded_images/mapped_output.jpg'
 
 # Correct answers for 30 questions
 CORRECT_ANSWERS = {
-    1: "C", 2: "D", 3: "A", 4: "E", 5: "B",
-    6: "D", 7: "A", 8: "C", 9: "C", 10: "E",
-    11: "B", 12: "D", 13: "A", 14: "C", 15: "E",
-    16: "B", 17: "D", 18: "B", 19: "C", 20: "E",
+    1: "B", 2: "C", 3: "C", 4: "B", 5: "D",
+    6: "D", 7: "B", 8: "C", 9: "B", 10: "C",
+    11: "B", 12: "B", 13: "C", 14: "B", 15: "B",
+    16: "A", 17: "B", 18: "E", 19: "C", 20: "E",
     21: "B", 22: "C", 23: "A", 24: "D", 25: "B",
     26: "B", 27: "E", 28: "C", 29: "A", 30: "A"
 }

@@ -13,6 +13,7 @@ import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { BASE_URL } from "../../config";
+import * as FileSystem from 'expo-file-system';
 
 export default function GradeScreen({ route, navigation }) {
   const { template, courseCode } = route.params; // ✅ passed from TemplatesScreen
@@ -50,18 +51,26 @@ export default function GradeScreen({ route, navigation }) {
 
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", {
-        uri: image,
-        type: "image/jpeg",
-        name: "answer_sheet.jpg",
+      // Read image as base64
+      const filename = image.split('/').pop();
+      const base64 = await FileSystem.readAsStringAsync(image, {
+        encoding: FileSystem.EncodingType.Base64,
       });
 
-      const response = await axios.post(`${BASE_URL}/grade`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      // Send base64 to backend
+      const response = await fetch(`${BASE_URL}/grade_base64`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          filename: filename,
+          content: base64,
+        }),
       });
 
-      const data = response.data;
+      const data = await response.json();
       if (!data || !data.answers) {
         throw new Error("Invalid grading response");
       }
