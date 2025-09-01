@@ -5,7 +5,7 @@ import os
 
 # === CONFIGURATION ===
 MODEL_PATH = 'models/yolov8_bubbles_best.pt'
-SAMPLE_IMAGE = 'Test_images/sheet11.jpg'
+SAMPLE_IMAGE = 'Test_images/alaa.jpg'
 OUTPUT_JSON = 'result/results.json'
 SAVE_IMAGE = 'graded_images/output_debug.jpg'
 DEBUG_DIVISION_IMAGE = 'graded_images/debug_divisions.jpg'
@@ -44,6 +44,7 @@ def map_bubbles_to_questions(boxes, confs, classes, q1_15_box, q16_30_box):
     q1_rows = divide_question_box(q1_15_box, 15)
     q2_rows = divide_question_box(q16_30_box, 15)
     question_map = {i: ["", 0.0] for i in range(1, 31)}
+    print(question_map)
 
     print("\n🔍 Mapping Detected Bubbles to Questions:")
     for box, conf, cls in zip(boxes, confs, classes):
@@ -69,7 +70,9 @@ def map_bubbles_to_questions(boxes, confs, classes, q1_15_box, q16_30_box):
                         question_map[i + 16] = [option, float(conf)]
                         print(f"[Q16–30] → Q{i+16} = {option} (conf: {conf:.2f})")
                     break
+    print(question_map)
     return question_map
+
 
 # === GRADING ===
 def grade_answers(question_map):
@@ -100,32 +103,48 @@ def grade_answers(question_map):
     }
 
 # === CONTOUR DETECTION ===
-def extract_boxes_from_contours(image):
+def extract_boxes_from_contours(image, debug_path=None):
+    os.makedirs("debug_outputs", exist_ok=True)
+
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                   cv2.THRESH_BINARY_INV, 15, 10)
+    cv2.imwrite("debug_outputs/step1_gray.jpg", gray)
+
+    thresh = cv2.adaptiveThreshold(
+        gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY_INV, 15, 10
+    )
+    cv2.imwrite("debug_outputs/step2_thresh.jpg", thresh)
+
     contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    debug_img = image.copy()
     rects = []
+
     for cnt in contours:
         approx = cv2.approxPolyDP(cnt, 0.02 * cv2.arcLength(cnt, True), True)
         if len(approx) == 4:
             x, y, w, h = cv2.boundingRect(approx)
             area = w * h
             rects.append((x, y, w, h, area))
+            cv2.rectangle(debug_img, (x,y), (x+w,y+h), (0,255,0), 2)
+
+    cv2.imwrite("debug_outputs/step3_all_contours.jpg", debug_img)
 
     rects = [r for r in rects if r[4] > 10000]
     rects = sorted(rects, key=lambda r: r[4], reverse=True)
 
-    q1_15_box = None
-    q16_30_box = None
     tall_boxes = [r for r in rects if r[3] > r[2] * 1.2]
     tall_boxes = sorted(tall_boxes, key=lambda r: r[0])  # left to right
 
     if len(tall_boxes) >= 2:
-        q1_15_box = tall_boxes[0][:4]
-        q16_30_box = tall_boxes[1][:4]
+        debug_img2 = image.copy()
+        cv2.rectangle(debug_img2, (tall_boxes[0][0], tall_boxes[0][1]),
+                      (tall_boxes[0][0]+tall_boxes[0][2], tall_boxes[0][1]+tall_boxes[0][3]), (255,0,0), 3)
+        cv2.rectangle(debug_img2, (tall_boxes[1][0], tall_boxes[1][1]),
+                      (tall_boxes[1][0]+tall_boxes[1][2], tall_boxes[1][1]+tall_boxes[1][3]), (0,0,255), 3)
+        cv2.imwrite("debug_outputs/step4_final_boxes.jpg", debug_img2)
+        return tall_boxes[0][:4], tall_boxes[1][:4]
 
-    return q1_15_box, q16_30_box
+    return None, None
 
 # === DRAW QUESTION ZONES ===
 def draw_divisions(image, box, start_q=1):

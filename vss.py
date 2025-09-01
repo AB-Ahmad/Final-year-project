@@ -1,22 +1,20 @@
+# process_mcq_sheet.py
 import cv2
 import os
+import re
 import numpy as np
 from ultralytics import YOLO
-import json
 
 # === CONFIGURATION ===
-MCQ_MODEL_PATH = "models/yolov8_bubbles_best.pt"
-REG_MODEL_PATH = "models/reg_number_model_v1.pt"
+MCQ_MODEL_PATH = 'models/yolov8_bubbles_best.pt'
+REG_MODEL_PATH = 'models/reg_number_model_v1.pt'
 
-# Template size after alignment
-TEMPLATE_WIDTH, TEMPLATE_HEIGHT = 2480, 3508
+CONF_THRESHOLD_MCQ = 0.5
+CONF_THRESHOLD_REG = 0.25
+EXPECTED_REG_LENGTH = 9
+REGEX_PATTERN = r'^U\d{2}[A-Z]{2}\d{4}$'
 
-# === FIXED ZONES (after alignment) ===
-REGION_REG_NO = (299,12,1016,219)    # Reg. No. box
-REGION_Q1_15  = (5,335,1177,3085)    # Left column (Q1–Q15)
-REGION_Q16_30 = (1296,335,1167,3094)   # Right column (Q16–Q30)
-
-# Answer Key
+# === ANSWER KEY ===
 CORRECT_ANSWERS = {
     1: "A", 2: "C", 3: "A", 4: "B", 5: "A",
     6: "D", 7: "A", 8: "C", 9: "A", 10: "A",
@@ -26,22 +24,14 @@ CORRECT_ANSWERS = {
     26: "A", 27: "A", 28: "C", 29: "B", 30: "A"
 }
 
-CLASS_NAMES = ["A", "B", "C", "D", "E", "INVALID"]
+CLASS_NAMES = ['A', 'B', 'C', 'D', 'E', 'INVALID']
 
-CONF_THRESHOLD_MCQ = 0.5
-CONF_THRESHOLD_REG = 0.05
-EXPECTED_REG_LENGTH = 9
-
-# === UTIL ===
+# === UTILS ===
 def correct_character(c):
-    subs = {"0": "O", "O": "O", "1": "1", "I": "1", "L": "1", "C ": "C", " ": ""}
+    subs = {'0': 'O', 'O': 'O', '1': '1', 'I': '1', 'L': '1', 'C ': 'C', ' ': ''}
     return subs.get(c, c)
 
-def crop_zone(image, region):
-    x, y, w, h = region
-    return image[y:y+h, x:x+w]
-
-# === STEP 1: Marker alignment ===
+# === STEP 1: ALIGN SHEET (optional, keep if markers are used) ===
 def find_markers_and_align(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -65,56 +55,56 @@ def find_markers_and_align(image):
                 candidates.append((cx, cy, cnt))
 
     if len(candidates) < 4:
-        print("⚠️ Marker detection failed — returning unaligned image")
-        return image
+        return image  # fallback if markers fail
 
-    # Closest candidates to 4 corners
     corners = [(0, 0), (w_img, 0), (0, h_img), (w_img, h_img)]
     closest = [min(candidates, key=lambda c: np.hypot(c[0] - cx, c[1] - cy))[:2] for cx, cy in corners]
 
-    src_pts = np.array(closest, dtype="float32")
-    dst_pts = np.array([[0, 0], [TEMPLATE_WIDTH, 0], [0, TEMPLATE_HEIGHT], [TEMPLATE_WIDTH, TEMPLATE_HEIGHT]], dtype="float32")
+    src_pts = np.array(closest, dtype='float32')
+    dst_pts = np.array([[0, 0], [2480, 0], [0, 3508], [2480, 3508]], dtype='float32')
 
     M = cv2.getPerspectiveTransform(src_pts, dst_pts)
-    aligned = cv2.warpPerspective(image, M, (TEMPLATE_WIDTH, TEMPLATE_HEIGHT))
+    return cv2.warpPerspective(image, M, (2480, 3508))
 
-    os.makedirs("debug_outputs", exist_ok=True)
-    cv2.imwrite("debug_outputs/aligned_sheet.jpg", aligned)
+# === STEP 2: CONTOUR-BASED REGION DETECTION ===
+def extract_boxes_from_contours(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                   cv2.THRESH_BINARY_INV, 15, 10)
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    rects = []
+    for cnt in contours:
+        approx = cv2.approxPolyDP(cnt, 0.02 * cv2.arcLength(cnt, True), True)
+        if len(approx) == 4:
+            x, y, w, h = cv2.boundingRect(approx)
+            area = w * h
+            rects.append((x, y, w, h, area))
 
-    return aligned
+    rects = [r for r in rects if r[4] > 10000]
+    rects = sorted(rects, key=lambda r: r[4], reverse=True)
 
-# === STEP 2: YOLO Predictions ===
+    tall_boxes = [r for r in rects if r[3] > r[2] * 1.2]
+    tall_boxes = sorted(tall_boxes, key=lambda r: r[0])  # left to right
+
+    if len(tall_boxes) >= 2:
+        return tall_boxes[0][:4], tall_boxes[1][:4]
+    return None, None
+
+# === STEP 3: YOLO PREDICTION ===
 def predict_mcq(image):
     model = YOLO(MCQ_MODEL_PATH)
     results = model.predict(image, conf=CONF_THRESHOLD_MCQ)[0]
     return results.boxes.xyxy, results.boxes.conf, results.boxes.cls
 
-def extract_reg_number(region_img):
-    model = YOLO(REG_MODEL_PATH)
-    results = model.predict(region_img, conf=CONF_THRESHOLD_REG)[0]
-
-    boxes = results.boxes.xyxy.cpu().numpy()
-    confs = results.boxes.conf.cpu().numpy()
-    classes = results.boxes.cls.cpu().numpy()
-    class_names = model.names
-
-    detections = sorted(zip(boxes, classes, confs), key=lambda x: x[2], reverse=True)[:EXPECTED_REG_LENGTH]
-    detections = sorted(detections, key=lambda x: x[0][0])
-
-    raw_chars = [class_names[int(cls)].strip().upper() for _, cls, _ in detections]
-    corrected = [correct_character(c) for c in raw_chars]
-
-    return "".join(corrected)
-
-# === STEP 3: Divide Questions ===
+# === STEP 4: MAPPING ===
 def divide_question_box(box, num_questions=15):
     x, y, w, h = box
     row_height = h / num_questions
     return [(x, y + i * row_height, w, row_height) for i in range(num_questions)]
 
-def map_bubbles_to_questions(boxes, confs, classes, q1_box, q2_box):
-    q1_rows = divide_question_box(q1_box, 15)
-    q2_rows = divide_question_box(q2_box, 15)
+def map_bubbles_to_questions(boxes, confs, classes, q1_15_box, q16_30_box):
+    q1_rows = divide_question_box(q1_15_box, 15)
+    q2_rows = divide_question_box(q16_30_box, 15)
 
     question_map = {i: ["", 0.0] for i in range(1, 31)}
 
@@ -133,10 +123,9 @@ def map_bubbles_to_questions(boxes, confs, classes, q1_box, q2_box):
             if x <= cx <= x + w and y <= cy <= y + h and conf > question_map[i + 16][1]:
                 question_map[i + 16] = [option, float(conf)]
                 break
-
     return question_map
 
-# === STEP 4: Grading ===
+# === STEP 5: GRADING ===
 def grade_answers(question_map):
     score, results = 0, []
     for q_num, (marked, conf) in question_map.items():
@@ -158,30 +147,39 @@ def grade_answers(question_map):
         })
     return {"score": score, "total": len(CORRECT_ANSWERS), "details": results}
 
+# === STEP 6: REG NUMBER ===
+def extract_reg_number(image):
+    model = YOLO(REG_MODEL_PATH)
+    results = model.predict(image, conf=CONF_THRESHOLD_REG)[0]
+
+    boxes = results.boxes.xyxy.cpu().numpy()
+    confs = results.boxes.conf.cpu().numpy()
+    classes = results.boxes.cls.cpu().numpy()
+    class_names = model.names
+
+    detections = sorted(zip(boxes, classes, confs), key=lambda x: x[2], reverse=True)[:EXPECTED_REG_LENGTH]
+    detections = sorted(detections, key=lambda x: x[0][0])
+
+    raw_chars = [class_names[int(cls)].strip().upper() for _, cls, _ in detections]
+    corrected_chars = [correct_character(c) for c in raw_chars]
+
+    return ''.join(corrected_chars)
+
 # === MAIN PIPELINE ===
 def process_sheet(image_path: str):
     if not os.path.exists(image_path):
         raise FileNotFoundError("Image not found.")
 
     original = cv2.imread(image_path)
-
-    # Step 1: Align
     aligned = find_markers_and_align(original)
 
-    # Step 2: Crop zones
-    reg_zone = crop_zone(aligned, REGION_REG_NO)
-    cv2.imwrite("debug_outputs/zone_reg.jpg", reg_zone)
-    cv2.imwrite("debug_outputs/zone_q1_15.jpg", crop_zone(aligned, REGION_Q1_15))
-    cv2.imwrite("debug_outputs/zone_q16_30.jpg", crop_zone(aligned, REGION_Q16_30))
+    q1_15_box, q16_30_box = extract_boxes_from_contours(aligned)
+    if not q1_15_box or not q16_30_box:
+        raise ValueError("Could not detect answer sheet regions.")
 
-    # Step 3: Extract Reg. Number
-    reg_number = extract_reg_number(reg_zone)
-
-    # Step 4: YOLO detections
+    reg_number = extract_reg_number(aligned)
     boxes, confs, classes = predict_mcq(aligned)
-
-    # Step 5: Mapping + Grading
-    question_map = map_bubbles_to_questions(boxes, confs, classes, REGION_Q1_15, REGION_Q16_30)
+    question_map = map_bubbles_to_questions(boxes, confs, classes, q1_15_box, q16_30_box)
     grading = grade_answers(question_map)
     answers = [item["marked"] for item in grading["details"]]
 
@@ -192,10 +190,3 @@ def process_sheet(image_path: str):
         "details": grading["details"],
         "answers": answers
     }
-
-# === TEST RUN ===
-if __name__ == "__main__":
-    SAMPLE_IMAGE = "Test_images/sample.jpg"
-    results = process_sheet(SAMPLE_IMAGE)
-
-    print(json.dumps(results, indent=2))

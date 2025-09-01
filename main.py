@@ -2,8 +2,13 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-import shutil, os, uuid, base64
+import shutil, os, uuid, base64, traceback
+
+# Import your processing function
 from process_mcq_sheet import process_sheet
+
+# Ensure debug folder exists
+os.makedirs("debug_outputs", exist_ok=True)
 
 app = FastAPI()
 
@@ -14,6 +19,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/ping")
 async def ping():
@@ -30,13 +36,19 @@ async def grade_mcq(file: UploadFile = File(...)):
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
+        # Process the uploaded sheet
         results = process_sheet(temp_path)
+
         return results
 
     except Exception as e:
+        # Print full error in console for debugging
+        print("❌ Backend error:", str(e))
+        traceback.print_exc()
+
         return JSONResponse(
             status_code=500,
-            content={"error": str(e), "answers": []}  # <-- ensures valid JSON
+            content={"error": str(e), "answers": []}
         )
     finally:
         if os.path.exists(temp_path):
@@ -62,13 +74,18 @@ async def grade_base64_image(data: Base64Image):
         with open(temp_path, "wb") as f:
             f.write(image_bytes)
 
+        # Process the uploaded sheet
         results = process_sheet(temp_path)
+
         return results
 
     except Exception as e:
+        print("❌ Backend error:", str(e))
+        traceback.print_exc()
+
         return JSONResponse(
             status_code=500,
-            content={"error": str(e), "answers": []}  # <-- always JSON
+            content={"error": str(e), "answers": []}
         )
     finally:
         if temp_path and os.path.exists(temp_path):

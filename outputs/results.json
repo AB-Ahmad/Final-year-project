@@ -1,0 +1,186 @@
+{
+  "score": 4,
+  "total": 30,
+  "details": [
+    {
+      "question": 1,
+      "marked": "C",
+      "correct": "B",
+      "status": "Wrong (marked C)"
+    },
+    {
+      "question": 2,
+      "marked": "B",
+      "correct": "C",
+      "status": "Wrong (marked B)"
+    },
+    {
+      "question": 3,
+      "marked": "INVALID",
+      "correct": "C",
+      "status": "Invalid Mark"
+    },
+    {
+      "question": 4,
+      "marked": "B",
+      "correct": "B",
+      "status": "Correct"
+    },
+    {
+      "question": 5,
+      "marked": "INVALID",
+      "correct": "D",
+      "status": "Invalid Mark"
+    },
+    {
+      "question": 6,
+      "marked": "C",
+      "correct": "D",
+      "status": "Wrong (marked C)"
+    },
+    {
+      "question": 7,
+      "marked": "INVALID",
+      "correct": "B",
+      "status": "Invalid Mark"
+    },
+    {
+      "question": 8,
+      "marked": "INVALID",
+      "correct": "C",
+      "status": "Invalid Mark"
+    },
+    {
+      "question": 9,
+      "marked": "INVALID",
+      "correct": "B",
+      "status": "Invalid Mark"
+    },
+    {
+      "question": 10,
+      "marked": "B",
+      "correct": "C",
+      "status": "Wrong (marked B)"
+    },
+    {
+      "question": 11,
+      "marked": "INVALID",
+      "correct": "B",
+      "status": "Invalid Mark"
+    },
+    {
+      "question": 12,
+      "marked": "INVALID",
+      "correct": "B",
+      "status": "Invalid Mark"
+    },
+    {
+      "question": 13,
+      "marked": "A",
+      "correct": "C",
+      "status": "Wrong (marked A)"
+    },
+    {
+      "question": 14,
+      "marked": "A",
+      "correct": "B",
+      "status": "Wrong (marked A)"
+    },
+    {
+      "question": 15,
+      "marked": "D",
+      "correct": "B",
+      "status": "Wrong (marked D)"
+    },
+    {
+      "question": 16,
+      "marked": "INVALID",
+      "correct": "A",
+      "status": "Invalid Mark"
+    },
+    {
+      "question": 17,
+      "marked": "B",
+      "correct": "B",
+      "status": "Correct"
+    },
+    {
+      "question": 18,
+      "marked": "B",
+      "correct": "E",
+      "status": "Wrong (marked B)"
+    },
+    {
+      "question": 19,
+      "marked": "B",
+      "correct": "C",
+      "status": "Wrong (marked B)"
+    },
+    {
+      "question": 20,
+      "marked": "INVALID",
+      "correct": "E",
+      "status": "Invalid Mark"
+    },
+    {
+      "question": 21,
+      "marked": "B",
+      "correct": "B",
+      "status": "Correct"
+    },
+    {
+      "question": 22,
+      "marked": "INVALID",
+      "correct": "C",
+      "status": "Invalid Mark"
+    },
+    {
+      "question": 23,
+      "marked": "C",
+      "correct": "A",
+      "status": "Wrong (marked C)"
+    },
+    {
+      "question": 24,
+      "marked": "C",
+      "correct": "D",
+      "status": "Wrong (marked C)"
+    },
+    {
+      "question": 25,
+      "marked": "B",
+      "correct": "B",
+      "status": "Correct"
+    },
+    {
+      "question": 26,
+      "marked": "INVALID",
+      "correct": "B",
+      "status": "Invalid Mark"
+    },
+    {
+      "question": 27,
+      "marked": "INVALID",
+      "correct": "E",
+      "status": "Invalid Mark"
+    },
+    {
+      "question": 28,
+      "marked": "INVALID",
+      "correct": "C",
+      "status": "Invalid Mark"
+    },
+    {
+      "question": 29,
+      "marked": "B",
+      "correct": "A",
+      "status": "Wrong (marked B)"
+    },
+    {
+      "question": 30,
+      "marked": "C",
+      "correct": "A",
+      "status": "Wrong (marked C)"
+    }
+  ]
+}

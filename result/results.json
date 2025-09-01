@@ -1,216 +1,216 @@
 {
-  "score": 4,
+  "score": 16,
   "total": 30,
   "details": [
     {
       "question": 1,
-      "marked": "A",
+      "marked": "B",
       "correct": "B",
-      "status": "Wrong (marked A)",
-      "confidence": 0.9256287813186646
+      "status": "Correct",
+      "confidence": 0.698626697063446
     },
     {
       "question": 2,
-      "marked": "B",
+      "marked": "C",
       "correct": "C",
-      "status": "Wrong (marked B)",
-      "confidence": 0.7505962252616882
+      "status": "Correct",
+      "confidence": 0.8423488140106201
     },
     {
       "question": 3,
-      "marked": "B",
+      "marked": "C",
       "correct": "C",
-      "status": "Wrong (marked B)",
-      "confidence": 0.7759266495704651
+      "status": "Correct",
+      "confidence": 0.8158372044563293
     },
     {
       "question": 4,
       "marked": "B",
       "correct": "B",
       "status": "Correct",
-      "confidence": 0.7913025617599487
+      "confidence": 0.8314817547798157
     },
     {
       "question": 5,
-      "marked": "C",
+      "marked": "D",
       "correct": "D",
-      "status": "Wrong (marked C)",
-      "confidence": 0.9415057301521301
+      "status": "Correct",
+      "confidence": 0.7762908339500427
     },
     {
       "question": 6,
-      "marked": "B",
+      "marked": "INVALID",
       "correct": "D",
-      "status": "Wrong (marked B)",
-      "confidence": 0.9080790281295776
+      "status": "Invalid Mark",
+      "confidence": 0.8303216099739075
     },
     {
       "question": 7,
-      "marked": "D",
+      "marked": "B",
       "correct": "B",
-      "status": "Wrong (marked D)",
-      "confidence": 0.6602040529251099
+      "status": "Correct",
+      "confidence": 0.639214813709259
     },
     {
       "question": 8,
-      "marked": "B",
+      "marked": "C",
       "correct": "C",
-      "status": "Wrong (marked B)",
-      "confidence": 0.8289459347724915
+      "status": "Correct",
+      "confidence": 0.7799571752548218
     },
     {
       "question": 9,
-      "marked": "E",
+      "marked": "B",
       "correct": "B",
-      "status": "Wrong (marked E)",
-      "confidence": 0.94864821434021
+      "status": "Correct",
+      "confidence": 0.8042687773704529
     },
     {
       "question": 10,
-      "marked": "B",
+      "marked": "C",
       "correct": "C",
-      "status": "Wrong (marked B)",
-      "confidence": 0.7918730974197388
+      "status": "Correct",
+      "confidence": 0.8721296787261963
     },
     {
       "question": 11,
-      "marked": "C",
+      "marked": "B",
       "correct": "B",
-      "status": "Wrong (marked C)",
-      "confidence": 0.9295620918273926
+      "status": "Correct",
+      "confidence": 0.8787392973899841
     },
     {
       "question": 12,
       "marked": "B",
       "correct": "B",
       "status": "Correct",
-      "confidence": 0.8580238223075867
+      "confidence": 0.887111485004425
     },
     {
       "question": 13,
-      "marked": "D",
+      "marked": "C",
       "correct": "C",
-      "status": "Wrong (marked D)",
-      "confidence": 0.8479206562042236
+      "status": "Correct",
+      "confidence": 0.8782538175582886
     },
     {
       "question": 14,
       "marked": "B",
       "correct": "B",
       "status": "Correct",
-      "confidence": 0.8866717219352722
+      "confidence": 0.8891041874885559
     },
     {
       "question": 15,
       "marked": "B",
       "correct": "B",
       "status": "Correct",
-      "confidence": 0.8931756019592285
+      "confidence": 0.8970449566841125
     },
     {
       "question": 16,
-      "marked": "B",
+      "marked": "A",
       "correct": "A",
-      "status": "Wrong (marked B)",
-      "confidence": 0.6343360543251038
+      "status": "Correct",
+      "confidence": 0.9368330240249634
     },
     {
       "question": 17,
-      "marked": "C",
+      "marked": "B",
       "correct": "B",
-      "status": "Wrong (marked C)",
-      "confidence": 0.7193860411643982
+      "status": "Correct",
+      "confidence": 0.566085696220398
     },
     {
       "question": 18,
       "marked": "A",
       "correct": "E",
       "status": "Wrong (marked A)",
-      "confidence": 0.9330440163612366
+      "confidence": 0.8142359256744385
     },
     {
       "question": 19,
-      "marked": "D",
+      "marked": "INVALID",
       "correct": "C",
-      "status": "Wrong (marked D)",
-      "confidence": 0.6660543084144592
+      "status": "Invalid Mark",
+      "confidence": 0.6537480354309082
     },
     {
       "question": 20,
-      "marked": "",
+      "marked": "INVALID",
       "correct": "E",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Invalid Mark",
+      "confidence": 0.8154503107070923
     },
     {
       "question": 21,
-      "marked": "A",
+      "marked": "INVALID",
       "correct": "B",
-      "status": "Wrong (marked A)",
-      "confidence": 0.8989354968070984
+      "status": "Invalid Mark",
+      "confidence": 0.8770133256912231
     },
     {
       "question": 22,
-      "marked": "B",
+      "marked": "INVALID",
       "correct": "C",
-      "status": "Wrong (marked B)",
-      "confidence": 0.8606557250022888
+      "status": "Invalid Mark",
+      "confidence": 0.893577516078949
     },
     {
       "question": 23,
-      "marked": "C",
+      "marked": "INVALID",
       "correct": "A",
-      "status": "Wrong (marked C)",
-      "confidence": 0.8310651779174805
+      "status": "Invalid Mark",
+      "confidence": 0.9097340106964111
     },
     {
       "question": 24,
-      "marked": "B",
+      "marked": "INVALID",
       "correct": "D",
-      "status": "Wrong (marked B)",
-      "confidence": 0.7247613668441772
+      "status": "Invalid Mark",
+      "confidence": 0.915198028087616
     },
     {
       "question": 25,
-      "marked": "E",
+      "marked": "INVALID",
       "correct": "B",
-      "status": "Wrong (marked E)",
-      "confidence": 0.9197646975517273
+      "status": "Invalid Mark",
+      "confidence": 0.9066446423530579
     },
     {
       "question": 26,
-      "marked": "",
+      "marked": "INVALID",
       "correct": "B",
-      "status": "Blank",
-      "confidence": 0.0
+      "status": "Invalid Mark",
+      "confidence": 0.9124594926834106
     },
     {
       "question": 27,
-      "marked": "D",
+      "marked": "INVALID",
       "correct": "E",
-      "status": "Wrong (marked D)",
-      "confidence": 0.8551185131072998
+      "status": "Invalid Mark",
+      "confidence": 0.9138043522834778
     },
     {
       "question": 28,
-      "marked": "B",
+      "marked": "INVALID",
       "correct": "C",
-      "status": "Wrong (marked B)",
-      "confidence": 0.6730520129203796
+      "status": "Invalid Mark",
+      "confidence": 0.9093881249427795
     },
     {
       "question": 29,
-      "marked": "B",
+      "marked": "INVALID",
       "correct": "A",
-      "status": "Wrong (marked B)",
-      "confidence": 0.600125253200531
+      "status": "Invalid Mark",
+      "confidence": 0.8954347968101501
     },
     {
       "question": 30,
-      "marked": "B",
+      "marked": "INVALID",
       "correct": "A",
-      "status": "Wrong (marked B)",
-      "confidence": 0.8619840145111084
+      "status": "Invalid Mark",
+      "confidence": 0.9354092478752136
     }
   ]
 }
